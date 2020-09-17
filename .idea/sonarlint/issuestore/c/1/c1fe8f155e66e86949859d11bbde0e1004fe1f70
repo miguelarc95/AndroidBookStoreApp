@@ -1,0 +1,8 @@
+
+d
+java:S1128
+"BRemove this unused import 'androidx.lifecycle.ViewModelProviders'.(ê· ºÿÿÿÿÿ8òšãÉ.
+b
+java:S1128"ERemove this unused import 'com.miguelarc.book_store_app.models.Book'.(ôêâ·8ôó•ãÉ.
+~
+java:S1450"\Remove the "homeViewModel" field and declare it as a local variable in the relevant methods.(¿­¶üÿÿÿÿ8‡Í­çÉ.
