@@ -16,9 +16,9 @@ public class HomeViewModel extends ViewModel {
     public LiveData<BookListResponse> getBookList(int maxResults, int startIndex) {
         if (bookListResponse == null) {
             bookListResponse = new MutableLiveData<>();
+        }
             BookStoreRepository bookStoreRepository = BookStoreRepository.getInstance();
             bookListResponse = bookStoreRepository.getBookList(SEARCH_TERM, maxResults, startIndex);
-        }
         return bookListResponse;
     }
 
