@@ -29,5 +29,13 @@ X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
 
 Oapp/src/main/java/com/miguelarc/book_store_app/network/BookStoreRepository.java,c\c\cced87a9024a155265e90df3d0ddeed5ae0d65ad
-s
-Capp/src/main/java/com/miguelarc/book_store_app/BookListAdapter.java,3\0\304b85967a003157a6437a3b3a95fa44c092b98a
+ƒ
+Sapp/src/main/java/com/miguelarc/book_store_app/viewmodels/BookDetailsViewModel.java,5\d\5d296cc447a894244c7f6d5106a3aa5bbf8386b1
+}
+Mapp/src/main/java/com/miguelarc/book_store_app/views/BookDetailsFragment.java,2\7\27a997417600da17c34e0566309bf134fd432f6d
+}
+Mapp/src/main/java/com/miguelarc/book_store_app/RecyclerViewClickListener.java,9\2\9280be30a989bdc6602b744ea4db36c96bb07983
+}
+Mapp/src/main/java/com/miguelarc/book_store_app/FragmentNavigationHandler.java,4\f\4f60e5aef14e725ec0dec39e64dfa6ca144b0d67
+|
+Lapp/src/main/java/com/miguelarc/book_store_app/adapters/BookListAdapter.java,7\7\770e53fa391174a48856e426693eeb27c6c8073b

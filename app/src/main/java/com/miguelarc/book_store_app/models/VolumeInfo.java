@@ -1,26 +1,23 @@
 package com.miguelarc.book_store_app.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.room.Embedded;
+import androidx.room.TypeConverter;
+import androidx.room.TypeConverters;
+
+import com.miguelarc.book_store_app.database.DataTypeConverter;
+
 import java.util.List;
 
-public  class VolumeInfo {
+public  class VolumeInfo implements Parcelable {
     private String title;
-    private String publisher;
     private String description;
-    private ReadingModes readingModes;
-    private int pageCount;
-    private String printType;
-    private double averageRating;
-    private int ratingsCount;
-    private String maturityRating;
-    private boolean allowAnonLogging;
-    private String contentVersion;
+    @Embedded
     private ImageLinks imageLinks;
-    private String language;
-    private String previewLink;
-    private String infoLink;
-    private String canonicalVolumeLink;
+    @TypeConverters(DataTypeConverter.class)
     private List<String> authors;
-    private List<IndustryIdentifiers> industryIdentifiers;
 
     public String getTitle() {
         return title;
@@ -28,14 +25,6 @@ public  class VolumeInfo {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
     }
 
     public String getDescription() {
@@ -46,108 +35,12 @@ public  class VolumeInfo {
         this.description = description;
     }
 
-    public ReadingModes getReadingModes() {
-        return readingModes;
-    }
-
-    public void setReadingModes(ReadingModes readingModes) {
-        this.readingModes = readingModes;
-    }
-
-    public int getPageCount() {
-        return pageCount;
-    }
-
-    public void setPageCount(int pageCount) {
-        this.pageCount = pageCount;
-    }
-
-    public String getPrintType() {
-        return printType;
-    }
-
-    public void setPrintType(String printType) {
-        this.printType = printType;
-    }
-
-    public double getAverageRating() {
-        return averageRating;
-    }
-
-    public void setAverageRating(double averageRating) {
-        this.averageRating = averageRating;
-    }
-
-    public int getRatingsCount() {
-        return ratingsCount;
-    }
-
-    public void setRatingsCount(int ratingsCount) {
-        this.ratingsCount = ratingsCount;
-    }
-
-    public String getMaturityRating() {
-        return maturityRating;
-    }
-
-    public void setMaturityRating(String maturityRating) {
-        this.maturityRating = maturityRating;
-    }
-
-    public boolean isAllowAnonLogging() {
-        return allowAnonLogging;
-    }
-
-    public void setAllowAnonLogging(boolean allowAnonLogging) {
-        this.allowAnonLogging = allowAnonLogging;
-    }
-
-    public String getContentVersion() {
-        return contentVersion;
-    }
-
-    public void setContentVersion(String contentVersion) {
-        this.contentVersion = contentVersion;
-    }
-
     public ImageLinks getImageLinks() {
         return imageLinks;
     }
 
     public void setImageLinks(ImageLinks imageLinks) {
         this.imageLinks = imageLinks;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public String getPreviewLink() {
-        return previewLink;
-    }
-
-    public void setPreviewLink(String previewLink) {
-        this.previewLink = previewLink;
-    }
-
-    public String getInfoLink() {
-        return infoLink;
-    }
-
-    public void setInfoLink(String infoLink) {
-        this.infoLink = infoLink;
-    }
-
-    public String getCanonicalVolumeLink() {
-        return canonicalVolumeLink;
-    }
-
-    public void setCanonicalVolumeLink(String canonicalVolumeLink) {
-        this.canonicalVolumeLink = canonicalVolumeLink;
     }
 
     public List<String> getAuthors() {
@@ -158,41 +51,7 @@ public  class VolumeInfo {
         this.authors = authors;
     }
 
-    public List<IndustryIdentifiers> getIndustryIdentifiers() {
-        return industryIdentifiers;
-    }
-
-    public void setIndustryIdentifiers(List<IndustryIdentifiers> industryIdentifiers) {
-        this.industryIdentifiers = industryIdentifiers;
-    }
-
-    public static class ReadingModes {
-        /**
-         * text : false
-         * image : true
-         */
-
-        private boolean text;
-        private boolean image;
-
-        public boolean isText() {
-            return text;
-        }
-
-        public void setText(boolean text) {
-            this.text = text;
-        }
-
-        public boolean isImage() {
-            return image;
-        }
-
-        public void setImage(boolean image) {
-            this.image = image;
-        }
-    }
-
-    public static class ImageLinks {
+    public static class ImageLinks implements Parcelable {
         /**
          * smallThumbnail : http://books.google.com/books/content?id=8u9wJowXfdUC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api
          * thumbnail : http://books.google.com/books/content?id=8u9wJowXfdUC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api
@@ -216,31 +75,75 @@ public  class VolumeInfo {
         public void setThumbnail(String thumbnail) {
             this.thumbnail = thumbnail;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.smallThumbnail);
+            dest.writeString(this.thumbnail);
+        }
+
+        public ImageLinks() {
+        }
+
+        protected ImageLinks(Parcel in) {
+            this.smallThumbnail = in.readString();
+            this.thumbnail = in.readString();
+        }
+
+        public static final Creator<ImageLinks> CREATOR = new Creator<ImageLinks>() {
+            @Override
+            public ImageLinks createFromParcel(Parcel source) {
+                return new ImageLinks(source);
+            }
+
+            @Override
+            public ImageLinks[] newArray(int size) {
+                return new ImageLinks[size];
+            }
+        };
     }
 
-    public static class IndustryIdentifiers {
-        /**
-         * type : ISBN_13
-         * identifier : 9788574524054
-         */
-
-        private String type;
-        private String identifier;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getIdentifier() {
-            return identifier;
-        }
-
-        public void setIdentifier(String identifier) {
-            this.identifier = identifier;
-        }
+    public VolumeInfo(String title, String description, ImageLinks imageLinks, List<String> authors) {
+        this.title = title;
+        this.description = description;
+        this.imageLinks = imageLinks;
+        this.authors = authors;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeParcelable(this.imageLinks, flags);
+        dest.writeStringList(this.authors);
+    }
+
+    protected VolumeInfo(Parcel in) {
+        this.title = in.readString();
+        this.description = in.readString();
+        this.imageLinks = in.readParcelable(ImageLinks.class.getClassLoader());
+        this.authors = in.createStringArrayList();
+    }
+
+    public static final Parcelable.Creator<VolumeInfo> CREATOR = new Parcelable.Creator<VolumeInfo>() {
+        @Override
+        public VolumeInfo createFromParcel(Parcel source) {
+            return new VolumeInfo(source);
+        }
+
+        @Override
+        public VolumeInfo[] newArray(int size) {
+            return new VolumeInfo[size];
+        }
+    };
 }

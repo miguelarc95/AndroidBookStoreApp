@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 import com.miguelarc.book_store_app.views.HomeFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentNavigationHandler {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

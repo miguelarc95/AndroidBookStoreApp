@@ -1,14 +1,23 @@
 package com.miguelarc.book_store_app.models;
 
-public class Book {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+import androidx.room.Embedded;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "book")
+public class Book implements Parcelable {
     private String kind;
-    private String id;
+    @PrimaryKey @NonNull private String id = "";
     private String etag;
     private String selfLink;
+    @Embedded
     private VolumeInfo volumeInfo;
+    @Embedded
     private SaleInfo saleInfo;
-    private AccessInfo accessInfo;
-    private SearchInfo searchInfo;
 
     public String getKind() {
         return kind;
@@ -18,6 +27,7 @@ public class Book {
         this.kind = kind;
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
@@ -58,21 +68,43 @@ public class Book {
         this.saleInfo = saleInfo;
     }
 
-    public AccessInfo getAccessInfo() {
-        return accessInfo;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setAccessInfo(AccessInfo accessInfo) {
-        this.accessInfo = accessInfo;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.kind);
+        dest.writeString(this.id);
+        dest.writeString(this.etag);
+        dest.writeString(this.selfLink);
+        dest.writeParcelable(this.volumeInfo, flags);
+        dest.writeParcelable(this.saleInfo, flags);
+
     }
 
-    public SearchInfo getSearchInfo() {
-        return searchInfo;
+    public Book() {
     }
 
-    public void setSearchInfo(SearchInfo searchInfo) {
-        this.searchInfo = searchInfo;
+    protected Book(Parcel in) {
+        this.kind = in.readString();
+        this.id = in.readString();
+        this.etag = in.readString();
+        this.selfLink = in.readString();
+        this.volumeInfo = in.readParcelable(VolumeInfo.class.getClassLoader());
+        this.saleInfo = in.readParcelable(SaleInfo.class.getClassLoader());
     }
 
+    public static final Parcelable.Creator<Book> CREATOR = new Parcelable.Creator<Book>() {
+        @Override
+        public Book createFromParcel(Parcel source) {
+            return new Book(source);
+        }
 
+        @Override
+        public Book[] newArray(int size) {
+            return new Book[size];
+        }
+    };
 }

@@ -1,31 +1,42 @@
 package com.miguelarc.book_store_app.models;
 
-public class SaleInfo {
-    private String country;
-    private String saleability;
-    private boolean isEbook;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-    public String getCountry() {
-        return country;
+public class SaleInfo implements Parcelable {
+    private String buyLink;
+
+    public String getBuyLink() {
+        return buyLink;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public SaleInfo(String buyLink) {
+        this.buyLink = buyLink;
     }
 
-    public String getSaleability() {
-        return saleability;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setSaleability(String saleability) {
-        this.saleability = saleability;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.buyLink);
     }
 
-    public boolean isIsEbook() {
-        return isEbook;
+    protected SaleInfo(Parcel in) {
+        this.buyLink = in.readString();
     }
 
-    public void setIsEbook(boolean isEbook) {
-        this.isEbook = isEbook;
-    }
+    public static final Parcelable.Creator<SaleInfo> CREATOR = new Parcelable.Creator<SaleInfo>() {
+        @Override
+        public SaleInfo createFromParcel(Parcel source) {
+            return new SaleInfo(source);
+        }
+
+        @Override
+        public SaleInfo[] newArray(int size) {
+            return new SaleInfo[size];
+        }
+    };
 }
