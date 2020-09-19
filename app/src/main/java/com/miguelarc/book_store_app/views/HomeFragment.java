@@ -63,6 +63,7 @@ public class HomeFragment extends Fragment {
             }
         }
     };
+    private int scrollPosition = 0;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -89,10 +90,15 @@ public class HomeFragment extends Fragment {
         bookListRecyclerView = rootView.findViewById(R.id.book_list_recycler_view);
         bookListRecyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), 2));
         bookListRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if (bookListRecyclerView.getAdapter() == null) {
-            bookListAdapter = new BookListAdapter(new ArrayList<Book>(), listener);
-            bookListRecyclerView.setAdapter(bookListAdapter);
-        }
+        bookListAdapter = new BookListAdapter(new ArrayList<Book>(), listener);
+        bookListAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                bookListRecyclerView.scrollToPosition(scrollPosition);
+            }
+        });
+        bookListRecyclerView.setAdapter(bookListAdapter);
     }
 
     private void initScrollListener() {
@@ -119,6 +125,7 @@ public class HomeFragment extends Fragment {
                     hasReachedEnd = true;
                 }
                 bookListAdapter.addBookItems(bookListResponse.getItems());
+                scrollPosition = bookListAdapter.getItemCount();
                 progressBar.setVisibility(View.GONE);
             }
         });
@@ -132,8 +139,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void onFavoriteCheckClicked(final boolean isChecked) {
-        favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), loadFavoriteBookListObserver);
         isFilteringByFavorites = isChecked;
+        favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), loadFavoriteBookListObserver);
     }
 
     private void clearBookList() {

@@ -15,12 +15,11 @@ import com.miguelarc.book_store_app.R;
 import com.miguelarc.book_store_app.RecyclerViewClickListener;
 import com.miguelarc.book_store_app.models.Book;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookListViewHolder> {
 
-    private List<Book> bookList = new ArrayList<>();
+    private List<Book> bookList;
     private RecyclerViewClickListener listener;
 
     public BookListAdapter(List<Book> bookList, RecyclerViewClickListener listener) {
