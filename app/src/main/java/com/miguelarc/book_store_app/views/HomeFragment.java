@@ -17,15 +17,16 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.miguelarc.book_store_app.database.FavoriteBooksDatabase;
 import com.miguelarc.book_store_app.FragmentNavigationHandler;
+import com.miguelarc.book_store_app.R;
 import com.miguelarc.book_store_app.RecyclerViewClickListener;
 import com.miguelarc.book_store_app.adapters.BookListAdapter;
-import com.miguelarc.book_store_app.R;
+import com.miguelarc.book_store_app.database.FavoriteBooksDatabase;
 import com.miguelarc.book_store_app.models.Book;
 import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
 import com.miguelarc.book_store_app.viewmodels.HomeViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
@@ -42,13 +43,24 @@ public class HomeFragment extends Fragment {
     private static final int PAGE_SIZE = 20;
     private ProgressBar progressBar;
     private boolean hasReachedEnd = false;
-    private CheckBox favoriteCheckBox;
     private boolean isFilteringByFavorites = false;
     private FavoriteBooksDatabase favoriteBooksDatabase;
     private CompoundButton.OnCheckedChangeListener favoriteCheckListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             onFavoriteCheckClicked(isChecked);
+        }
+    };
+    private Observer<List<Book>> loadFavoriteBookListObserver = new Observer<List<Book>>() {
+        @Override
+        public void onChanged(List<Book> favoriteBookList) {
+            if (isFilteringByFavorites) {
+                clearBookList();
+                bookListAdapter.addBookItems(favoriteBookList);
+            } else {
+                clearBookList();
+                bookListAdapter.addBookItems(homeViewModel.getBookList());
+            }
         }
     };
 
@@ -60,7 +72,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         progressBar = rootView.findViewById(R.id.main_progress);
-        favoriteCheckBox = rootView.findViewById(R.id.favorites_check_box);
+        CheckBox favoriteCheckBox = rootView.findViewById(R.id.favorites_check_box);
         favoriteCheckBox.setOnCheckedChangeListener(favoriteCheckListener);
         favoriteBooksDatabase = FavoriteBooksDatabase.getInstance(this.getContext());
 
@@ -77,6 +89,10 @@ public class HomeFragment extends Fragment {
         bookListRecyclerView = rootView.findViewById(R.id.book_list_recycler_view);
         bookListRecyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), 2));
         bookListRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        if (bookListRecyclerView.getAdapter() == null) {
+            bookListAdapter = new BookListAdapter(new ArrayList<Book>(), listener);
+            bookListRecyclerView.setAdapter(bookListAdapter);
+        }
     }
 
     private void initScrollListener() {
@@ -85,11 +101,9 @@ public class HomeFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-                if (gridLayoutManager != null && gridLayoutManager.findLastCompletelyVisibleItemPosition() == bookListAdapter.getItemCount() - 1) {
-                    if (!hasReachedEnd && !isFilteringByFavorites) {
-                        progressBar.setVisibility(View.VISIBLE);
-                        loadBooks();
-                    }
+                if (gridLayoutManager != null && gridLayoutManager.findLastCompletelyVisibleItemPosition() == bookListAdapter.getItemCount() - 1 && !hasReachedEnd && !isFilteringByFavorites) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    loadBooks();
                 }
             }
         });
@@ -104,12 +118,7 @@ public class HomeFragment extends Fragment {
                     // Reached end of list. App shouldn't be requesting more items.
                     hasReachedEnd = true;
                 }
-                if (bookListAdapter == null) {
-                    bookListAdapter = new BookListAdapter(bookListResponse.getItems(), listener);
-                } else {
-                    bookListAdapter.addBookItems(bookListResponse.getItems());
-                }
-                bookListRecyclerView.setAdapter(bookListAdapter);
+                bookListAdapter.addBookItems(bookListResponse.getItems());
                 progressBar.setVisibility(View.GONE);
             }
         });
@@ -122,24 +131,24 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    private void onFavoriteCheckClicked(boolean isChecked) {
+    private void onFavoriteCheckClicked(final boolean isChecked) {
+        favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), loadFavoriteBookListObserver);
         if (isChecked) {
-            favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), new Observer<List<Book>>() {
-                @Override
-                public void onChanged(List<Book> favoriteBookList) {
-                    isFilteringByFavorites = true;
-                    clearBookList();
-                    bookListAdapter.addBookItems(favoriteBookList);
-                }
-            });
+            isFilteringByFavorites = true;
+
         } else {
             isFilteringByFavorites = false;
-            clearBookList();
-            bookListAdapter.addBookItems(homeViewModel.getBookList());
+
         }
     }
 
     private void clearBookList() {
         bookListAdapter.clearBookItems();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        favoriteBooksDatabase.bookDao().loadFavoriteBooks().removeObserver(loadFavoriteBookListObserver);
     }
 }
