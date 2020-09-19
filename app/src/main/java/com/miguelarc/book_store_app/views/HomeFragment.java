@@ -133,13 +133,7 @@ public class HomeFragment extends Fragment {
 
     private void onFavoriteCheckClicked(final boolean isChecked) {
         favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), loadFavoriteBookListObserver);
-        if (isChecked) {
-            isFilteringByFavorites = true;
-
-        } else {
-            isFilteringByFavorites = false;
-
-        }
+        isFilteringByFavorites = isChecked;
     }
 
     private void clearBookList() {
