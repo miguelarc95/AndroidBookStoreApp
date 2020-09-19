@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,26 +18,25 @@ import com.miguelarc.book_store_app.models.Book;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookListViewHolder> {
 
     private List<Book> bookList = new ArrayList<>();
     private RecyclerViewClickListener listener;
 
-    public BookListAdapter(RecyclerViewClickListener listener) {
+    public BookListAdapter(List<Book> bookList, RecyclerViewClickListener listener) {
+        this.bookList = bookList;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BookListAdapter.BookListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new BookListViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.book_list_item, parent, false), listener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof BookListViewHolder) {
-            populateBookItem((BookListViewHolder) holder, position);
-        }
+    public void onBindViewHolder(@NonNull BookListViewHolder holder, int position) {
+        populateBookItem(holder, position);
     }
 
     @Override
@@ -44,10 +44,36 @@ public class BookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         return bookList == null ? 0 : bookList.size();
     }
 
-    public void addBookItems (List<Book> newBookItems) {
-        if (newBookItems != null) {
-            bookList.addAll(newBookItems);
-            notifyDataSetChanged();
+    public void addBookItems(final List<Book> newBookList) {
+        DiffUtil.Callback diffUtilCallback = new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return bookList.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return newBookList.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return newBookList.get(newItemPosition).getId().equals(bookList.get(oldItemPosition).getId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return newBookList.get(newItemPosition) == bookList.get(oldItemPosition);
+            }
+        };
+
+        bookList.addAll(newBookList);
+        DiffUtil.calculateDiff(diffUtilCallback).dispatchUpdatesTo(this);
+    }
+
+    public void clearBookItems() {
+        if (bookList != null) {
+            bookList.clear();
         }
     }
 
@@ -64,9 +90,10 @@ public class BookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 .into(holder.imageView);
     }
 
-    public static class BookListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class BookListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private ImageView imageView;
         private RecyclerViewClickListener listener;
+
         public BookListViewHolder(View view, RecyclerViewClickListener listener) {
             super(view);
             this.listener = listener;
@@ -76,7 +103,7 @@ public class BookListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         @Override
         public void onClick(View v) {
-            listener.onItemClicked(getAdapterPosition());
+            listener.onItemClicked(bookList.get(getAdapterPosition()));
         }
     }
 }

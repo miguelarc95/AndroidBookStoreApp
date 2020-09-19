@@ -5,7 +5,10 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +29,7 @@ import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
 import com.miguelarc.book_store_app.viewmodels.HomeViewModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
@@ -36,12 +40,18 @@ public class HomeFragment extends Fragment {
     private static final int PAGE_SIZE = 20;
     private ProgressBar progressBar;
     private boolean hasReachedEnd = false;
-    private List<Book> bookList = new ArrayList<>();
+    private CheckBox favoriteCheckBox;
     private FavoriteBooksDatabase favoriteBooksDatabase;
     private RecyclerViewClickListener listener = new RecyclerViewClickListener() {
         @Override
-        public void onItemClicked(int position) {
-            onBookClicked(position);
+        public void onItemClicked(Book book) {
+            onBookClicked(book);
+        }
+    };
+    private CompoundButton.OnCheckedChangeListener favoriteCheckListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            onFavoriteCheckClicked(isChecked);
         }
     };
 
@@ -53,21 +63,21 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         progressBar = rootView.findViewById(R.id.main_progress);
-
+        favoriteCheckBox = rootView.findViewById(R.id.favorites_check_box);
+        favoriteCheckBox.setOnCheckedChangeListener(favoriteCheckListener);
         favoriteBooksDatabase = FavoriteBooksDatabase.getInstance(this.getContext());
 
         initRecyclerView(rootView);
         initScrollListener();
 
         // Loading initial batch of books
-        loadBooks(0);
+        loadInitialBooks();
+
         return rootView;
     }
 
     private void initRecyclerView(View rootView) {
         bookListRecyclerView = rootView.findViewById(R.id.book_list_recycler_view);
-        bookListAdapter = new BookListAdapter(listener);
-        bookListRecyclerView.setAdapter(bookListAdapter);
         bookListRecyclerView.setLayoutManager(new GridLayoutManager(this.getContext(), 2));
         bookListRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
@@ -81,40 +91,75 @@ public class HomeFragment extends Fragment {
                 if (gridLayoutManager != null && gridLayoutManager.findLastCompletelyVisibleItemPosition() == bookListAdapter.getItemCount() - 1) {
                     if (!hasReachedEnd) {
                         progressBar.setVisibility(View.VISIBLE);
-                        // Mocking network delay for API call
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                loadBooks(bookListAdapter.getItemCount());
-                            }
-                        }, 1000);
+                        loadNextBooks();
                     }
                 }
             }
         });
     }
 
-    private void loadBooks(int startIndex) {
+    private void loadInitialBooks() {
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        homeViewModel.getBookList(PAGE_SIZE, startIndex).observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
+        homeViewModel.getInitialBookList().observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
             @Override
             public void onChanged(BookListResponse bookListResponse) {
                 if (bookListResponse.getItems().size() < PAGE_SIZE) {
                     // Reached end of list. App shouldn't be requesting more items.
                     hasReachedEnd = true;
                 }
-                bookList.addAll(bookListResponse.getItems());
-                bookListAdapter.addBookItems(bookListResponse.getItems());
+                if (bookListAdapter == null) {
+                    bookListAdapter = new BookListAdapter(bookListResponse.getItems(), listener);
+                } else {
+                    bookListAdapter.addBookItems(bookListResponse.getItems());
+                }
+                bookListRecyclerView.setAdapter(bookListAdapter);
                 progressBar.setVisibility(View.GONE);
             }
         });
     }
 
-    private void onBookClicked(int position) {
-        Book clickedBook = bookList.get(position);
+    private void loadNextBooks() {
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel.getNextBookList().observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
+            @Override
+            public void onChanged(BookListResponse bookListResponse) {
+                if (bookListResponse.getItems().size() < PAGE_SIZE) {
+                    // Reached end of list. App shouldn't be requesting more items.
+                    hasReachedEnd = true;
+                }
+                if (bookListAdapter == null) {
+                    bookListAdapter = new BookListAdapter(bookListResponse.getItems(), listener);
+                } else {
+                    bookListAdapter.addBookItems(bookListResponse.getItems());
+                }
+                bookListRecyclerView.setAdapter(bookListAdapter);
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void onBookClicked(Book clickedBook) {
         BookDetailsFragment bookDetailsFragment = BookDetailsFragment.newInstance(clickedBook);
         if (this.getActivity() != null) {
             ((FragmentNavigationHandler)this.getActivity()).pushFragment(bookDetailsFragment);
         }
+    }
+
+    private void onFavoriteCheckClicked(boolean isChecked) {
+        if (isChecked) {
+            favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), new Observer<List<Book>>() {
+                @Override
+                public void onChanged(List<Book> favoriteBookList) {
+                    clearBookList();
+                    bookListAdapter.addBookItems(favoriteBookList);
+                }
+            });
+        } else {
+            loadInitialBooks();
+        }
+    }
+
+    private void clearBookList() {
+        bookListAdapter.clearBookItems();
     }
 }
