@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNavigatio
 
     public void pushFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, fragment, fragment.getTag());
+        transaction.add(R.id.container, fragment, fragment.getTag());
         transaction.addToBackStack(fragment.getClass().getName());
         transaction.commit();
     }

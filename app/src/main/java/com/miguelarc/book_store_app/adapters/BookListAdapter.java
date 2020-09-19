@@ -45,7 +45,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookLi
     }
 
     public void addBookItems(final List<Book> newBookList) {
-        DiffUtil.Callback diffUtilCallback = new DiffUtil.Callback() {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
             public int getOldListSize() {
                 return bookList.size();
@@ -65,15 +65,16 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookLi
             public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
                 return newBookList.get(newItemPosition) == bookList.get(oldItemPosition);
             }
-        };
+        });
 
         bookList.addAll(newBookList);
-        DiffUtil.calculateDiff(diffUtilCallback).dispatchUpdatesTo(this);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void clearBookItems() {
         if (bookList != null) {
             bookList.clear();
+            notifyDataSetChanged();
         }
     }
 

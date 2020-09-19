@@ -13,14 +13,10 @@ Happ/src/main/java/com/miguelarc/book_store_app/network/BookStoreApi.java,3\0\3
 Lapp/src/main/java/com/miguelarc/book_store_app/viewmodels/HomeViewModel.java,0\8\089468a7fa6d898023a1be2cd86ff6454d93d89f
 v
 Fapp/src/main/java/com/miguelarc/book_store_app/views/HomeFragment.java,c\1\c1fe8f155e66e86949859d11bbde0e1004fe1f70
-u
-Eapp/src/main/java/com/miguelarc/book_store_app/models/SearchInfo.java,6\a\6a5ac73669d65820aa9195bea6ac6d6c5a691b70
 s
 Capp/src/main/java/com/miguelarc/book_store_app/models/SaleInfo.java,2\f\2fe6d5b9637dac22b700b162d7170d7f8921736e
 u
 Eapp/src/main/java/com/miguelarc/book_store_app/models/VolumeInfo.java,2\6\26ad5976c2a4dc4872e52e859be5149d440aea90
-u
-Eapp/src/main/java/com/miguelarc/book_store_app/models/AccessInfo.java,6\1\611bf021ac9bb92c5200fddfe5bf3f6eeb96068e
 o
 ?app/src/main/java/com/miguelarc/book_store_app/models/Book.java,3\b\3b38c42b40c3dd33284ff9adb508de8904e09afc
 ‹

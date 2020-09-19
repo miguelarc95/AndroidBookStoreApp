@@ -138,7 +138,7 @@ public class BookDetailsFragment extends Fragment {
             bookAuthorLabel.setText(selectedBook.getVolumeInfo().getAuthors().toString());
             bookDescriptionLabel.setText(selectedBook.getVolumeInfo().getDescription());
 
-            if (selectedBook.getSaleInfo().getBuyLink() != null) {
+            if (selectedBook.getSaleInfo() != null && selectedBook.getSaleInfo().getBuyLink() != null) {
                 buyNowButton.setVisibility(View.VISIBLE);
                 buyNowButton.setOnClickListener(new View.OnClickListener() {
                     @Override

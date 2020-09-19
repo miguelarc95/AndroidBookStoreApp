@@ -2,6 +2,7 @@ package com.miguelarc.book_store_app.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.miguelarc.book_store_app.models.Book;
@@ -18,22 +19,30 @@ public class HomeViewModel extends ViewModel {
 
     private static final String SEARCH_TERM = "android";
 
-    public LiveData<BookListResponse> getInitialBookList() {
+    private Observer<BookListResponse> bookListResponseObserver = new Observer<BookListResponse>() {
+        @Override
+        public void onChanged(BookListResponse bookListResponse) {
+            bookList.addAll(bookListResponse.getItems());
+        }
+    };
+
+    public LiveData<BookListResponse> loadBookList() {
         if (bookListResponse == null) {
             bookListResponse = new MutableLiveData<>();
         }
             BookStoreRepository bookStoreRepository = BookStoreRepository.getInstance();
-            bookListResponse = bookStoreRepository.getBookList(SEARCH_TERM, PAGE_SIZE, 0);
+            bookListResponse = bookStoreRepository.getBookList(SEARCH_TERM, PAGE_SIZE, bookList.size());
+            bookListResponse.observeForever(bookListResponseObserver);
         return bookListResponse;
     }
 
-    public LiveData<BookListResponse> getNextBookList() {
-        if (bookListResponse == null) {
-            bookListResponse = new MutableLiveData<>();
-        }
-        BookStoreRepository bookStoreRepository = BookStoreRepository.getInstance();
-        bookListResponse = bookStoreRepository.getBookList(SEARCH_TERM, PAGE_SIZE, bookList.size());
-        return bookListResponse;
+    public List<Book> getBookList() {
+        return bookList;
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        bookListResponse.removeObserver(bookListResponseObserver);
+    }
 }
