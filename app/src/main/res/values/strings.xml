@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">book-store-app</string>
+    <string name="app_name">Book Store</string>
     <string name="title">Title: </string>
     <string name="authors">Author(s): </string>
     <string name="description">Description: </string>

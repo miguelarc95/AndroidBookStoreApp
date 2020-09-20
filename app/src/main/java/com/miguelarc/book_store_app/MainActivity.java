@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements FragmentNavigatio
 
     public void pushFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
         transaction.add(R.id.container, fragment, fragment.getTag());
         transaction.addToBackStack(fragment.getClass().getName());
         transaction.commit();

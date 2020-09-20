@@ -10,19 +10,20 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.miguelarc.book_store_app.R;
 import com.miguelarc.book_store_app.database.FavoriteBooksDatabase;
 import com.miguelarc.book_store_app.models.Book;
 import com.miguelarc.book_store_app.viewmodels.BookDetailsViewModel;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class BookDetailsFragment extends Fragment {
 
@@ -56,13 +57,9 @@ public class BookDetailsFragment extends Fragment {
         bookDescriptionLabel = rootView.findViewById(R.id.book_description);
         buyNowButton = rootView.findViewById(R.id.buy_now_button);
         favoriteBooksDatabase = FavoriteBooksDatabase.getInstance(this.getContext());
-
         bookDetailsViewModel = new ViewModelProvider(this).get(BookDetailsViewModel.class);
-
         loadBookInformation();
         initFavoriteIcon();
-
-
         return rootView;
     }
 
@@ -73,10 +70,10 @@ public class BookDetailsFragment extends Fragment {
             public void onChanged(Book book) {
                 if (book != null) {
                     isFavorite = true;
-                    favoriteIcon.setImageResource(R.drawable.baseline_favorite_24);
+                    favoriteIcon.setImageResource(R.drawable.baseline_favorite);
                     return;
                 }
-                favoriteIcon.setImageResource(R.drawable.baseline_favorite_border_24);
+                favoriteIcon.setImageResource(R.drawable.baseline_favorite_border);
             }
         });
 
@@ -121,10 +118,10 @@ public class BookDetailsFragment extends Fragment {
 
     void setFavoriteIcon() {
         if (isFavorite) {
-            favoriteIcon.setImageResource(R.drawable.baseline_favorite_24);
+            favoriteIcon.setImageResource(R.drawable.baseline_favorite);
             Toast.makeText(this.getContext(), "Marked as favorite!", Toast.LENGTH_SHORT).show();
         } else {
-            favoriteIcon.setImageResource(R.drawable.baseline_favorite_border_24);
+            favoriteIcon.setImageResource(R.drawable.baseline_favorite_border);
             Toast.makeText(this.getContext(), "Removed from favorites!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -137,7 +134,6 @@ public class BookDetailsFragment extends Fragment {
             bookTitleLabel.setText(selectedBook.getVolumeInfo().getTitle());
             bookAuthorLabel.setText(selectedBook.getVolumeInfo().getAuthors().toString());
             bookDescriptionLabel.setText(selectedBook.getVolumeInfo().getDescription());
-
             if (selectedBook.getSaleInfo() != null && selectedBook.getSaleInfo().getBuyLink() != null) {
                 buyNowButton.setVisibility(View.VISIBLE);
                 buyNowButton.setOnClickListener(new View.OnClickListener() {

@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="8dp"
-    app:cardUseCompatPadding="true">
+    app:cardCornerRadius="8dp"
+    app:cardUseCompatPadding="true"
+    android:foreground="?android:attr/selectableItemBackground">
     <ImageView
         android:id="@+id/book_thumbnail"
         android:layout_width="match_parent"
