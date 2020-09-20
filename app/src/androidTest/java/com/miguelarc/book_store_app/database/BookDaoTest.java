@@ -38,7 +38,7 @@ public class BookDaoTest {
     }
 
     @After
-    public void closeDatabase() {
+    public void cleanUp() {
         database.close();
     }
 
