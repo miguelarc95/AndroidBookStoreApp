@@ -1,10 +1,14 @@
 package com.miguelarc.book_store_app.viewmodels;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 
+import com.miguelarc.book_store_app.database.FavoriteBooksRepository;
 import com.miguelarc.book_store_app.models.Book;
 import com.miguelarc.book_store_app.network.BookStoreRepository;
 import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
@@ -12,10 +16,12 @@ import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeViewModel extends ViewModel {
+public class HomeViewModel extends AndroidViewModel {
     private static final int PAGE_SIZE = 20;
     private MutableLiveData<BookListResponse> bookListResponse;
     private List<Book> bookList = new ArrayList<>();
+    BookStoreRepository bookStoreRepository;
+    FavoriteBooksRepository favoriteBooksRepository;
 
     private static final String SEARCH_TERM = "android";
 
@@ -26,14 +32,23 @@ public class HomeViewModel extends ViewModel {
         }
     };
 
+    public HomeViewModel(@NonNull Application application) {
+        super(application);
+        bookStoreRepository = BookStoreRepository.getInstance();
+        favoriteBooksRepository = FavoriteBooksRepository.getInstance(application);
+    }
+
     public LiveData<BookListResponse> loadBookList() {
         if (bookListResponse == null) {
             bookListResponse = new MutableLiveData<>();
         }
-            BookStoreRepository bookStoreRepository = BookStoreRepository.getInstance();
-            bookListResponse = bookStoreRepository.getBookList(SEARCH_TERM, PAGE_SIZE, bookList.size());
-            bookListResponse.observeForever(bookListResponseObserver);
+        bookListResponse = bookStoreRepository.getBookList(SEARCH_TERM, PAGE_SIZE, bookList.size());
+        bookListResponse.observeForever(bookListResponseObserver);
         return bookListResponse;
+    }
+
+    public LiveData<List<Book>> loadFavoriteBooks() {
+        return favoriteBooksRepository.getFavoriteBooks();
     }
 
     public List<Book> getBookList() {

@@ -16,7 +16,7 @@ public class BookDetailsViewModel extends AndroidViewModel {
 
     public BookDetailsViewModel(@NonNull Application application) {
         super(application);
-        favoriteBooksRepository = new FavoriteBooksRepository(application);
+        favoriteBooksRepository = FavoriteBooksRepository.getInstance(application);
         insertResult = favoriteBooksRepository.getInsertResult();
         removeResult = favoriteBooksRepository.getRemoveResult();
     }

@@ -1,5 +1,11 @@
 package com.miguelarc.book_store_app.views;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +28,6 @@ import com.miguelarc.book_store_app.FragmentNavigationHandler;
 import com.miguelarc.book_store_app.R;
 import com.miguelarc.book_store_app.RecyclerViewClickListener;
 import com.miguelarc.book_store_app.adapters.BookListAdapter;
-import com.miguelarc.book_store_app.database.FavoriteBooksDatabase;
 import com.miguelarc.book_store_app.models.Book;
 import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
 import com.miguelarc.book_store_app.viewmodels.HomeViewModel;
@@ -44,7 +50,6 @@ public class HomeFragment extends Fragment {
     private ProgressBar progressBar;
     private boolean hasReachedEnd = false;
     private boolean isFilteringByFavorites = false;
-    private FavoriteBooksDatabase favoriteBooksDatabase;
     private CompoundButton.OnCheckedChangeListener favoriteCheckListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -75,7 +80,7 @@ public class HomeFragment extends Fragment {
         progressBar = rootView.findViewById(R.id.main_progress);
         CheckBox favoriteCheckBox = rootView.findViewById(R.id.favorites_check_box);
         favoriteCheckBox.setOnCheckedChangeListener(favoriteCheckListener);
-        favoriteBooksDatabase = FavoriteBooksDatabase.getInstance(this.getContext());
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         initRecyclerView(rootView);
         initScrollListener();
@@ -116,19 +121,24 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadBooks() {
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        homeViewModel.loadBookList().observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
-            @Override
-            public void onChanged(BookListResponse bookListResponse) {
-                if (bookListResponse.getItems().size() < PAGE_SIZE) {
-                    // Reached end of list. App shouldn't be requesting more items.
-                    hasReachedEnd = true;
+        if (isNetworkAvailable(this.getContext())) {
+            homeViewModel.loadBookList().observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
+                @Override
+                public void onChanged(BookListResponse bookListResponse) {
+                    if (bookListResponse.getItems().size() < PAGE_SIZE) {
+                        // Reached end of list. App shouldn't be requesting more items.
+                        hasReachedEnd = true;
+                    }
+                    bookListAdapter.addBookItems(bookListResponse.getItems());
+                    scrollPosition = bookListAdapter.getItemCount();
+                    progressBar.setVisibility(View.GONE);
                 }
-                bookListAdapter.addBookItems(bookListResponse.getItems());
-                scrollPosition = bookListAdapter.getItemCount();
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+            });
+        } else {
+            Toast.makeText(this.getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+            progressBar.setVisibility(View.GONE);
+        }
+
     }
 
     private void onBookClicked(Book clickedBook) {
@@ -140,7 +150,7 @@ public class HomeFragment extends Fragment {
 
     private void onFavoriteCheckClicked(final boolean isChecked) {
         isFilteringByFavorites = isChecked;
-        favoriteBooksDatabase.bookDao().loadFavoriteBooks().observe(getViewLifecycleOwner(), loadFavoriteBookListObserver);
+        homeViewModel.loadFavoriteBooks().observe(getViewLifecycleOwner(), loadFavoriteBookListObserver);
     }
 
     private void clearBookList() {
@@ -150,6 +160,19 @@ public class HomeFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        favoriteBooksDatabase.bookDao().loadFavoriteBooks().removeObserver(loadFavoriteBookListObserver);
+        homeViewModel.loadFavoriteBooks().removeObserver(loadFavoriteBookListObserver);
+    }
+
+    private Boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network nw = connectivityManager.getActiveNetwork();
+            if (nw == null) return false;
+            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+        } else {
+            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
+            return nwInfo != null && nwInfo.isConnected();
+        }
     }
 }

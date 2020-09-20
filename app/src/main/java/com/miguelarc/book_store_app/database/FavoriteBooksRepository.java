@@ -2,9 +2,12 @@ package com.miguelarc.book_store_app.database;
 
 import android.content.Context;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.miguelarc.book_store_app.models.Book;
+
+import java.util.List;
 
 public class FavoriteBooksRepository {
 
@@ -12,9 +15,22 @@ public class FavoriteBooksRepository {
     private MutableLiveData<Integer> insertResult = new MutableLiveData<>();
     private MutableLiveData<Integer> removeResult = new MutableLiveData<>();
 
+    private static FavoriteBooksRepository favoriteBooksRepository;
+
     public FavoriteBooksRepository(Context context) {
         FavoriteBooksDatabase database = FavoriteBooksDatabase.getInstance(context);
         bookDao = database.bookDao();
+    }
+
+    public static FavoriteBooksRepository getInstance(Context context) {
+        if (favoriteBooksRepository == null) {
+            favoriteBooksRepository = new FavoriteBooksRepository(context);
+        }
+        return favoriteBooksRepository;
+    }
+
+    public LiveData<List<Book>> getFavoriteBooks() {
+        return bookDao.loadFavoriteBooks();
     }
 
     public void insert(Book book) {

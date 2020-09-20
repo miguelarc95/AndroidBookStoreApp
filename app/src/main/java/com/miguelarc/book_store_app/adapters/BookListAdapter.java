@@ -81,7 +81,7 @@ public class BookListAdapter extends RecyclerView.Adapter<BookListAdapter.BookLi
         Book book = bookList.get(position);
         String imageUrl = null;
         if (book.getVolumeInfo().getImageLinks() != null) {
-            imageUrl = book.getVolumeInfo().getImageLinks().getSmallThumbnail();
+            imageUrl = book.getVolumeInfo().getImageLinks().getThumbnail();
         }
         Glide.with(holder.imageView.getContext())
                 .load(imageUrl)

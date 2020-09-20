@@ -1,7 +1,5 @@
 package com.miguelarc.book_store_app.network;
 
-import android.database.Observable;
-
 import androidx.lifecycle.MutableLiveData;
 
 import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
