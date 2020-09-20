@@ -67,6 +67,11 @@ public class HomeViewModel extends AndroidViewModel {
         bookListResponse.removeObserver(bookListResponseObserver);
     }
 
+    /**
+     * isNetworkAvailable() - Method used to see if the device is online.
+     * @param context
+     * @return - true if device is online, false otherwise.
+     */
     public Boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

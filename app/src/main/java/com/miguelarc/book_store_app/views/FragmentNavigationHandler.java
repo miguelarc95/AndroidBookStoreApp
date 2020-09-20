@@ -1,4 +1,4 @@
-package com.miguelarc.book_store_app;
+package com.miguelarc.book_store_app.views;
 
 import androidx.fragment.app.Fragment;
 

@@ -9,6 +9,9 @@ import com.miguelarc.book_store_app.models.Book;
 
 import java.util.List;
 
+/**
+ * Repository that handles all DB insertions, deletions and queries.
+ */
 public class FavoriteBooksRepository {
 
     private final BookDao bookDao;

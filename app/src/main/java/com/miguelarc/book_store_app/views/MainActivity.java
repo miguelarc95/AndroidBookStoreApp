@@ -1,4 +1,4 @@
-package com.miguelarc.book_store_app;
+package com.miguelarc.book_store_app.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 
-import com.miguelarc.book_store_app.views.HomeFragment;
+import com.miguelarc.book_store_app.R;
 
 public class MainActivity extends AppCompatActivity implements FragmentNavigationHandler {
 

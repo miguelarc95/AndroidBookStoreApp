@@ -1,11 +1,5 @@
 package com.miguelarc.book_store_app.views;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +18,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.miguelarc.book_store_app.FragmentNavigationHandler;
 import com.miguelarc.book_store_app.R;
-import com.miguelarc.book_store_app.RecyclerViewClickListener;
+import com.miguelarc.book_store_app.adapters.RecyclerViewClickListener;
 import com.miguelarc.book_store_app.adapters.BookListAdapter;
 import com.miguelarc.book_store_app.models.Book;
 import com.miguelarc.book_store_app.network.responsemodels.BookListResponse;
@@ -120,6 +113,10 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * loadBooks() - Observes changes done to the list of books in the ViewModel (which are
+     * fetch from API), and updates RecyclerView adapter accordingly.
+     */
     private void loadBooks() {
         if (this.getContext() != null) {
             if (homeViewModel.isNetworkAvailable(this.getContext())) {

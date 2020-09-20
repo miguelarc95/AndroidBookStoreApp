@@ -1,4 +1,4 @@
-package com.miguelarc.book_store_app;
+package com.miguelarc.book_store_app.adapters;
 
 import android.view.View;
 
