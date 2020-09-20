@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.room.Embedded;
-import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 
 import com.miguelarc.book_store_app.database.DataTypeConverter;
@@ -23,39 +22,19 @@ public  class VolumeInfo implements Parcelable {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public ImageLinks getImageLinks() {
         return imageLinks;
     }
 
-    public void setImageLinks(ImageLinks imageLinks) {
-        this.imageLinks = imageLinks;
-    }
-
     public List<String> getAuthors() {
         return authors;
     }
 
-    public void setAuthors(List<String> authors) {
-        this.authors = authors;
-    }
-
     public static class ImageLinks implements Parcelable {
-        /**
-         * smallThumbnail : http://books.google.com/books/content?id=8u9wJowXfdUC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api
-         * thumbnail : http://books.google.com/books/content?id=8u9wJowXfdUC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api
-         */
 
         private String smallThumbnail;
         private String thumbnail;

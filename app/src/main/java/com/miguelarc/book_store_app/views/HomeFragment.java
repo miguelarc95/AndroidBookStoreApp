@@ -121,24 +121,25 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadBooks() {
-        if (isNetworkAvailable(this.getContext())) {
-            homeViewModel.loadBookList().observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
-                @Override
-                public void onChanged(BookListResponse bookListResponse) {
-                    if (bookListResponse.getItems().size() < PAGE_SIZE) {
-                        // Reached end of list. App shouldn't be requesting more items.
-                        hasReachedEnd = true;
+        if (this.getContext() != null) {
+            if (homeViewModel.isNetworkAvailable(this.getContext())) {
+                homeViewModel.loadBookList().observe(getViewLifecycleOwner(), new Observer<BookListResponse>() {
+                    @Override
+                    public void onChanged(BookListResponse bookListResponse) {
+                        if (bookListResponse.getItems().size() < PAGE_SIZE) {
+                            // Reached end of list. App shouldn't be requesting more items.
+                            hasReachedEnd = true;
+                        }
+                        bookListAdapter.addBookItems(bookListResponse.getItems());
+                        scrollPosition = bookListAdapter.getItemCount();
+                        progressBar.setVisibility(View.GONE);
                     }
-                    bookListAdapter.addBookItems(bookListResponse.getItems());
-                    scrollPosition = bookListAdapter.getItemCount();
-                    progressBar.setVisibility(View.GONE);
-                }
-            });
-        } else {
-            Toast.makeText(this.getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
-            progressBar.setVisibility(View.GONE);
+                });
+            } else {
+                Toast.makeText(this.getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+            }
         }
-
     }
 
     private void onBookClicked(Book clickedBook) {
@@ -161,18 +162,5 @@ public class HomeFragment extends Fragment {
     public void onPause() {
         super.onPause();
         homeViewModel.loadFavoriteBooks().removeObserver(loadFavoriteBookListObserver);
-    }
-
-    private Boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Network nw = connectivityManager.getActiveNetwork();
-            if (nw == null) return false;
-            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
-            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
-        } else {
-            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
-            return nwInfo != null && nwInfo.isConnected();
-        }
     }
 }
