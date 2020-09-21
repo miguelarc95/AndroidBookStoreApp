@@ -10,20 +10,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.miguelarc.book_store_app.R;
 import com.miguelarc.book_store_app.database.FavoriteBooksDatabase;
 import com.miguelarc.book_store_app.models.Book;
 import com.miguelarc.book_store_app.viewmodels.BookDetailsViewModel;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class BookDetailsFragment extends Fragment {
 
@@ -132,7 +131,7 @@ public class BookDetailsFragment extends Fragment {
             selectedBook = bundle.getParcelable(BOOK_KEY);
             loadBookCover();
             bookTitleLabel.setText(selectedBook.getVolumeInfo().getTitle());
-            bookAuthorLabel.setText(selectedBook.getVolumeInfo().getAuthors().toString());
+            bookAuthorLabel.setText(bookDetailsViewModel.getFormattedAuthors(selectedBook.getVolumeInfo().getAuthors()));
             bookDescriptionLabel.setText(selectedBook.getVolumeInfo().getDescription());
             if (selectedBook.getSaleInfo() != null && selectedBook.getSaleInfo().getBuyLink() != null) {
                 buyNowButton.setVisibility(View.VISIBLE);
