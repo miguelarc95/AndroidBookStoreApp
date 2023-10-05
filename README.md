@@ -1,4 +1,4 @@
-# Book Store App
+# Android Book Store App
 
 A simple Android app to showcase use of Android Jetpack Library usage.
 This application makes use of Google Book's API in order to fetch and display Android-related books. It also adds the capability to store and filter by your favorite books.
