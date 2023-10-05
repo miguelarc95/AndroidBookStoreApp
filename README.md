@@ -1,7 +1,12 @@
 # Android Book Store App
 
-A simple Android app to showcase use of Android Jetpack Library usage.
-This application makes use of Google Book's API in order to fetch and display Android-related books. It also adds the capability to store and filter by your favorite books.
+A simple Android app to showcase the use of some Android Jetpack Library features.
+This application makes use of Google Books API in order to fetch and display Android-related books. It also adds the capability to store and filter by your favorite books.
+<p align="center">
+ <img src="app/screenshots/screenshot_1.PNG?raw=true" width="400">
+ <img src="app/screenshots/screenshot_2.PNG?raw=true" width="400">
+</p>
+
 It uses the following libraries:
 * ViewModel - using lates MVVM pattern to abstract dependencies between view and business logic;
   * https://developer.android.com/reference/android/arch/lifecycle/ViewModel
